@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-    <h1>service page</h1>
+    <h1 class="hed">service page</h1>
     <ul>
         <li>
             <a href="{{ route('service1')}}">service 1</a>

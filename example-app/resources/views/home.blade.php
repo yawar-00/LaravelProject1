@@ -1,5 +1,5 @@
 @extends('layouts.master')
 @section('content')
- <h1>Home page</h1>
- <img src="{{asset('asset/img.jpg')}}" height=400px width=100%>
+ <h1 class="hed">Home page</h1>
+ <img src="{{asset('asset/img.jpg')}}" id="home-img">
 @endsection

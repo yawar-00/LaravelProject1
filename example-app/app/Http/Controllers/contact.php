@@ -9,4 +9,5 @@ class contact extends Controller
     public function getcontact(){
         return view('contact');
     }
+    
 }
