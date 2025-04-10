@@ -18,6 +18,9 @@
         <li class="nav-item">
           <a class="nav-link" href="{{ route('service')}}">service</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('insertByAjax')}}">InsertByAjax</a>
+        </li>
       </ul>
     </div>
   </div>

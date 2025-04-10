@@ -19,5 +19,6 @@
   <br><br>
   <button type="submit">Submit</button> 
 </form>
-  <button style="margin=0 50%"><a href="{{route('show')}}">Show Student</a></button>
+  <button style="margin:50px 300px"><a href="{{route('show')}}">Show Student</a></button>
+  <button style="margin:50px 300px"><a href="{{route('insertByAjax')}}">Insert By AJAX</a></button>
 @endsection
