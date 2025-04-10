@@ -28,10 +28,14 @@ class productController extends Controller
         return redirect('/contact.insertByAjax')->with('status', 'Inserted');
     }
     public function deleteproduct(int $id)
-    {
+    {   
         $product = Product::find($id);
         // dd($product);
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }   
         $product->delete();
-        return response()->json(['status' => true]);
+        return response()->json(['success' => 'Product deleted successfully']);
+
     }
 }

@@ -28,7 +28,7 @@
                 <td>{{$item->price}}</td>
                 <td>
                     <a href="{{url('contact/' . $item->id . '/editProduct')}}" class="btn btn-success ">edit</a>
-                    <a onclick="deleteProduct($item->id)" class="btn btn-danger ">delete</a>
+                    <a class="btn btn-danger deleteProduct" href="#" data-id="{{$item->id}}">delete</a>
                 </td>
             </tr>
             @endforeach
@@ -72,43 +72,54 @@
 
 
 <script>
-function deleteProduct(e) {
-    // console.log(id);
-    e.preventDefault();
-    // var url = e.currentTarget.getAttribute('href')x
-    Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: "Deleted!",
-                text: "Your file has been deleted.",
-                icon: "success"
-            });
-        }
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.deleteProduct');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click',function (e) {
+                e.preventDefault();
+
+                const ProductId = button.getAttribute('data-id');
+                    Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This will delete the category permanently!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                    
+                })
+    .then(result => {
+                    if (result.isConfirmed) {
+                        axios.delete(`deleteProduct/${ProductId}`)
+                        .then(response => {
+                            Swal.fire('Deleted!', response.data.success, 'success');
+                            button.closest('tr').remove();
+                        }).catch(error => {
+                            Swal.fire('Error!', 'There was a problem deleting the category.', 'error');
+                        });
+                    }
+                });
+            });
+        });
     });
 
-    // if (confirm("Are you Sure to delete")) {
-    //     $.ajaxSetup({
-    //         headers: {
-    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    //         }
-    //     });
-    //     $.ajax({
-    //         url: 'deleteProduct/' + id,
-    //         type: 'DELETE',
-    //         status: function(result) {
+//     if (confirm("Are you Sure to delete")) {
+//         $.ajaxSetup({
+//             headers: {
+//                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+//             }
+//         });
+//         $.ajax({
+//             url: 'deleteProduct/' + id,
+//             type: 'DELETE',
+//             status: function(result) {
 
-    //         }
-    //     })
-    // }
-}
+//             }
+//         })
+//     }
+// }
 </script>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
