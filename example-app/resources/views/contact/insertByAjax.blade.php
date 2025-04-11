@@ -1,12 +1,17 @@
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 @extends('layouts.master')
 @section('content')
-@if(session('status'))
+<!-- @if(session('status'))
 <div class="alert alert-success">{{session('status')}}</div>
-@endif
+@endif -->
 
+<h1 id="response"></h1>
 <div class="card " style="width: 50rem;margin:0 25% !important">
     <div class="card-body text-end">
-        <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#ProductForm">
             Add Student
         </button>
         </a>
@@ -20,24 +25,14 @@
                 <th scope="col">Action</th>
             </tr>
         </thead>
-        <tbody>
-            @foreach($product as $item)
-            <tr>
-                <td>{{$item->id}}</td>
-                <td>{{$item->name}}</td>
-                <td>{{$item->price}}</td>
-                <td>
-                    <a href="{{url('contact/' . $item->id . '/editProduct')}}" class="btn btn-success ">edit</a>
-                    <a class="btn btn-danger deleteProduct" href="#" data-id="{{$item->id}}">delete</a>
-                </td>
-            </tr>
-            @endforeach
+        <tbody id="tabledata">
+
         </tbody>
     </table>
 </div>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="addModalLabel">
-    <form id="addproductform" action="{{ route('storeproduct') }}" method="POST">
+<div class="modal fade" id="ProductForm" tabindex="-1" aria-labelledby="addModalLabel">
+    <form id="addproductform">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -47,63 +42,147 @@
                 <div class="modal-body">
 
                     @csrf
-
+                    <input name="id" id="id" type="hidden">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name">
-                    <!-- @error('name') <span class="text-danger">{{$message}}</span>@enderror -->
                     <br><br>
                     <label for="enroll">Price:</label>
                     <input type="text" id="price" name="price">
-                    <!-- @error('price') <span class="text-danger">{{$message}}</span>@enderror -->
                     <br><br>
                     <button type="submit" class="btn btn-secondary add_product" data-bs-dismiss="modal">Add
                         Product</button>
                 </div>
 
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-
-            </div>
-
         </div>
     </form>
 </div>
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const deleteButtons = document.querySelectorAll('.deleteProduct');
+$(document).ready(function() {
 
-        deleteButtons.forEach(button => {
-            button.addEventListener('click',function (e) {
-                e.preventDefault();
+    $('#addproductform').on('submit', function(e) {
+        e.preventDefault();
+        var data = $('#addproductform').serialize();
 
-                const ProductId = button.getAttribute('data-id');
-                    Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'This will delete the category permanently!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!',
-                    
-                })
-    .then(result => {
-                    if (result.isConfirmed) {
-                        axios.delete(`deleteProduct/${ProductId}`)
-                        .then(response => {
-                            Swal.fire('Deleted!', response.data.success, 'success');
-                            button.closest('tr').remove();
-                        }).catch(error => {
-                            Swal.fire('Error!', 'There was a problem deleting the category.', 'error');
-                        });
+        $.ajax({
+            url: "/contact.insertByAjax",
+            type: "POST",
+            data: {
+                "_token": "{{csrf_token()}}",
+                data: data
+            },
+            success: function(response) {
+                $('#response').html(response);
+                $('#addproductform')[0].reset();
+                $('#ProductForm').modal('hide');
+                fetchrecords();
+            }
+        });
+
+    })
+
+    $(document).on('click', '.editProduct', function(e) {
+        e.preventDefault();
+        var id = $(this).val();
+        // alert(id)
+        $.ajax({
+            url: 'editproduct',
+            type: 'POST',
+            data: {
+                "_token": "{{csrf_token()}}",
+                id: id
+            },
+            success: function(resp) {
+                $('#addproductform')[0].reset();
+                $('#id').val(resp.id);
+                $('#name').val(resp.name);
+                $('#price').val(resp.price);
+                $('#ProductForm').modal('show');
+                // fetchrecords();
+            }
+
+        });
+    })
+
+    //delte
+    $(document).on('click', '.deleteproduct', function(e) {
+        e.preventDefault();
+        var id = $(this).val();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This record will be permanently deleted!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: 'deleteProduct',
+                    type: 'POST',
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        id: id
+                    },
+                    success: function(response) {
+                        Swal.fire(
+                            'Deleted!',
+                            'The record has been deleted.',
+                            'success'
+                        );
+                        fetchrecords();
+                        $('#respanel').html(response);
+                    },
+                    error: function(xhr) {
+                        Swal.fire(
+                            'Error!',
+                            'Something went wrong while deleting.',
+                            'error'
+                        );
                     }
                 });
-            });
-        });
+            }
+        });
     });
+
+
+    function fetchrecords() {
+        $.ajax({
+            url: '/contact.showByAjax',
+            type: 'GET',
+            success: function(resp) {
+                var tr = "";
+                for (var i = 0; i < resp.length; i++) {
+                    var id = resp[i].id;
+                    var name = resp[i].name;
+                    var price = resp[i].price;
+
+                    tr += '<tr>';
+
+
+                    tr += '<td>' + id + '</td>';
+                    tr += '<td>' + name + '</td>';
+                    tr += '<td>' + price + '</td>';
+                    tr += '<td><button type="button" class="btn btn-warning editProduct" value="' +
+                        id +
+                        '">Edit</button></td>';
+                    tr += '<td><button type="button" class="btn btn-danger deleteproduct" value="' +
+                        id + '">Delete</button></td>';
+
+                    tr += '</tr>';
+
+
+                }
+                $('#tabledata').html(tr);
+            }
+        });
+    }
+    fetchrecords();
+});
+
 
 //     if (confirm("Are you Sure to delete")) {
 //         $.ajaxSetup({
@@ -122,7 +201,5 @@
 // }
 </script>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
 @endsection
