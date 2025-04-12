@@ -23,15 +23,20 @@ class productController extends Controller
         parse_str($request->input('data'),$formData);
         $tbl->name=$formData['name'];
         $tbl->price=$formData['price'];
-        if(empty($formData['id'])||($formData['id']==""))
-        $tbl->save();
+        if(empty($formData['id'])||($formData['id']=="")){
+            $tbl->save();
+            return response()->json(['status' => 'success', 'message' => 'Product Added']);
+        }
       else{
         $tbl=Product::find($formData['id']);
+        if (!$tbl) {
+            return response()->json(['status' => 'error', 'message' => 'Product not found'], 404);
+        }
         $tbl->name=$formData['name'];
         $tbl->price=$formData['price'];
         $tbl->update();
+        return response()->json(['status' => 'success', 'message' => 'Product Updated']);
       }
-        echo "data successfully Inserted";
         // $request->validate([
         //     'name' => 'required|max:255|string',
         //     'price' => 'required|numeric'

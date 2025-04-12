@@ -46,7 +46,7 @@
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name">
                     <br><br>
-                    <label for="enroll">Price:</label>
+                    <label for="price">Price:</label>
                     <input type="text" id="price" name="price">
                     <br><br>
                     <button type="submit" class="btn btn-secondary add_product" data-bs-dismiss="modal">Add
@@ -61,11 +61,9 @@
 
 <script>
 $(document).ready(function() {
-
     $('#addproductform').on('submit', function(e) {
         e.preventDefault();
         var data = $('#addproductform').serialize();
-
         $.ajax({
             url: "/contact.insertByAjax",
             type: "POST",
@@ -74,15 +72,31 @@ $(document).ready(function() {
                 data: data
             },
             success: function(response) {
+                clear();
                 $('#response').html(response);
-                $('#addproductform')[0].reset();
                 $('#ProductForm').modal('hide');
-                fetchrecords();
+                fetchrecords(); 
+                Swal.fire({
+                    icon: 'success',
+                    title: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            },
+            error: function(xhr) {
+                let errorMsg = "Something went wrong!";
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    errorMsg = Object.values(xhr.responseJSON.errors).map(err => err[0]).join('\n');
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMsg
+                });
             }
         });
-
-    })
-
+    });
     $(document).on('click', '.editProduct', function(e) {
         e.preventDefault();
         var id = $(this).val();
@@ -105,6 +119,11 @@ $(document).ready(function() {
 
         });
     })
+
+    function clear() {
+    $('#addproductform')[0].reset();
+    $('#id').val('');
+    }
 
     //delte
     $(document).on('click', '.deleteproduct', function(e) {
