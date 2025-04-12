@@ -34,6 +34,6 @@ Route::put('/contact/{id}/edit', [studentController::class, 'update']);
 Route::get('/contact/{id}/delete', [studentController::class, 'delete']);
 Route::get('/contact.insertByAjax', [productController::class, 'show'])->name('insertByAjax');
 Route::get('/contact.showByAjax', [productController::class, 'showProduct']);
-Route::post('/contact.insertByAjax', [productController::class, 'storeProduct']);
+Route::post('/contact.insertByAjax', [productController::class, 'storeProduct'])->name('storeProduct');
 Route::post('/deleteProduct', [productController::class, 'deletelProduct']);
 Route::post('/editproduct', [productController::class, 'editProduct']);

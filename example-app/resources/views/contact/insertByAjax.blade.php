@@ -1,5 +1,3 @@
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 @extends('layouts.master')
@@ -20,6 +18,7 @@
         <thead>
             <tr>
                 <th scope="col">id</th>
+                <th scope="col">Image</th>
                 <th scope="col">Name</th>
                 <th scope="col">price</th>
                 <th scope="col">Action</th>
@@ -49,10 +48,12 @@
                     <label for="price">Price:</label>
                     <input type="text" id="price" name="price">
                     <br><br>
+                    <input type="file" name="image" id="image">
+                    <br><br>
                     <button type="submit" class="btn btn-secondary add_product" data-bs-dismiss="modal">Add
                         Product</button>
                 </div>
-
+                
             </div>
         </div>
     </form>
@@ -63,24 +64,23 @@
 $(document).ready(function() {
     $('#addproductform').on('submit', function(e) {
         e.preventDefault();
-        var data = $('#addproductform').serialize();
-        $.ajax({
-            url: "/contact.insertByAjax",
-            type: "POST",
-            data: {
-                "_token": "{{csrf_token()}}",
-                data: data
-            },
-            success: function(response) {
-                clear();
-                $('#response').html(response);
-                $('#ProductForm').modal('hide');
-                fetchrecords(); 
-                Swal.fire({
-                    icon: 'success',
-                    title: response.message,
-                    showConfirmButton: false,
-                    timer: 1500
+            let form_data = new FormData(this);
+            $.ajax({
+                url:"{{ route('storeProduct') }}",
+                method:'POST',
+                data:form_data,
+                cache:false,
+                contentType: false,
+                processData: false,
+                success:function(res){
+                    clear();
+                    $('#ProductForm').modal('hide');
+                    fetchrecords(); 
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
                 });
             },
             error: function(xhr) {
@@ -95,8 +95,9 @@ $(document).ready(function() {
                     text: errorMsg
                 });
             }
+            });
         });
-    });
+ 
     $(document).on('click', '.editProduct', function(e) {
         e.preventDefault();
         var id = $(this).val();
@@ -176,6 +177,9 @@ $(document).ready(function() {
                 var tr = "";
                 for (var i = 0; i < resp.length; i++) {
                     var id = resp[i].id;
+                    var img=resp[i].image;
+                    // console.log(img);
+                    
                     var name = resp[i].name;
                     var price = resp[i].price;
 
@@ -183,6 +187,8 @@ $(document).ready(function() {
 
 
                     tr += '<td>' + id + '</td>';
+                    
+                    tr += '<td><img src="'+img+'" ></td>';
                     tr += '<td>' + name + '</td>';
                     tr += '<td>' + price + '</td>';
                     tr += '<td><button type="button" class="btn btn-warning editProduct" value="' +
