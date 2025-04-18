@@ -1,8 +1,35 @@
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-@extends('layouts.master')
-@section('content')
-<div class="container mt-5">
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Product List</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <style>
+        .product-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .error-text {
+            font-size: 0.875rem;
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container mt-5">
         <h2 class="mb-4">Product List</h2>
 
         <!-- Button trigger modal -->
@@ -17,7 +44,7 @@
                 <tr>
                     <th>#</th>
                     <th>Name</th>
-                    <th>Price</th>
+                    <th>Description</th>
                     <th>Image</th>
                     <th>Actions</th>
                 </tr>
@@ -27,7 +54,7 @@
                 <tr id="product_{{ $product->id }}">
                     <td>{{ $index+1 }}</td>
                     <td>{{ $product->name }}</td>
-                    <td>{{ $product->price }}</td>
+                    <td>{{ $product->description }}</td>
                     <td>
                         @if($product->image)
                         <img src="{{ asset($product->image) }}" style="width: 120px; height: 60px; cursor:pointer;"
@@ -72,9 +99,9 @@
                         <span class="text-danger error-text name_error"></span>
                     </div>
                     <div class="form-group mb-3">
-                        <label>Price</label>
-                        <input type="text" name="price" class="form-control" required>
-                        <span class="text-danger error-text price_error"></span>
+                        <label>Description:</label>
+                        <textarea name="description" class="form-control" required></textarea>
+                        <span class="text-danger error-text description_error"></span>
                     </div>
                     <div class="form-group mb-3">
                         <label>Image:</label>
@@ -106,9 +133,10 @@
                         <span class="text-danger error-text name_error"></span>
                     </div>
                     <div class="form-group mb-3">
-                        <label>Price:</label>
-                        <input name="price" id="editProductPrice" class="form-control"required>
-                        <span class="text-danger error-text price_error"></span>
+                        <label>Description:</label>
+                        <textarea name="description" id="editProductDescription" class="form-control"
+                            required></textarea>
+                        <span class="text-danger error-text description_error"></span>
                     </div>
                     <div class="form-group mb-3">
                         <label>Image:</label>
@@ -188,7 +216,7 @@
                     let newRow = `<tr id="product_${response.product.id}">
                         <td>${response.product.index}</td>
                         <td>${response.product.name}</td>
-                        <td>${response.product.price}</td>
+                        <td>${response.product.description}</td>
                         <td><img src="${response.product.image}" class="product-img" alt="Image"></td>
                         <td><button class="btn btn-warning btn-sm editProductBtn" data-id="${response.product.id}">Edit</button>
                         <button class="btn btn-danger btn-sm deleteProductBtn" data-id="${response.product.id}">Delete</button></td>
@@ -219,7 +247,7 @@
                 success: function(response) {
                     $('#editProductId').val(response.product.id);
                     $('#editProductName').val(response.product.name);
-                    $('#editProductPrice').val(response.product.price);
+                    $('#editProductDescription').val(response.product.description);
     
                     // Set the image preview
                     if (response.product.image) {
@@ -251,7 +279,7 @@
                     $('#editProductForm')[0].reset();
                     $('#editProductModal').modal('hide');
                     $(`#product_${response.product.id} td:nth-child(2)`).text(response.product.name);
-                    $(`#product_${response.product.id} td:nth-child(3)`).text(response.product.price);
+                    $(`#product_${response.product.id} td:nth-child(3)`).text(response.product.description);
                     $(`#product_${response.product.id} td:nth-child(4) img`).attr('src', response.product.image);
                 },
                 error: function(xhr) {
@@ -302,6 +330,6 @@
     </script>
 
 
+</body>
 
-
-@endsection
+</html>
